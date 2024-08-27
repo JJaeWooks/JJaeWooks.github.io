@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {observer} from 'mobx-react-lite';
 import {useNavigate} from 'react-router-dom';
@@ -21,36 +21,44 @@ const ResultPage = observer(() => {
 
     // 퀴즈 결과를 기반으로 간단한 메시지를 표시
     const result = resultStore.answers
-    const flower: string[] = ["스투키", "스킨답서스", "선인장", "크루시아", "행운목", "산호수"]
-    let resultContent = ""
+    const flower: string[] = ["스투키", "스킨답서스", "우주목", "크루시아", "행운목", "산호수"]
+    const [resultContent, setResultContent] = useState("")
+    const [white, setWhite] = useState(false);
+    const [dark, setDark] = useState(false);
     // 결과에 따라 로컬 스토리지 값을 업데이트
-    if (result[0]) {
-        if (!result[1] && result[3] && getQuantity('stookie') > 0) {
-            resultContent = flower[0];
-            setQuantity('stookie', getQuantity('stookie') - 1);
-        } else if (!result[3] && getQuantity('goldenPothos') > 0) {
-            resultContent = flower[1];
-            setQuantity('goldenPothos', getQuantity('goldenPothos') - 1);
-        } else if (result[1] && getQuantity('cactus') > 0) {
-            resultContent = flower[2];
-            setQuantity('cactus', getQuantity('cactus') - 1);
-        } else {
-            resultContent = "양지식물";
+
+    useEffect(() => {
+
+        if (result[0]) {
+            if (!result[1] && result[3] && getQuantity('스투키') > 0) {
+                setResultContent(flower[0])
+                setQuantity('스투키', getQuantity('스투키') - 1);
+            } else if (!result[3] && getQuantity('스킨답서스') > 0) {
+                setResultContent(flower[1])
+                setQuantity('스킨답서스', getQuantity('스킨답서스') - 1);
+            } else if (result[1] && getQuantity('우주목') > 0) {
+                setResultContent(flower[2])
+                setQuantity('우주목', getQuantity('우주목') - 1);
+            } else {
+                // setResultContent = "양지식물";
+                setWhite(true)
+            }
+        } else if (!result[0]) {
+            if (!result[1] && result[3] && getQuantity('크루시아') > 0) {
+                setResultContent(flower[3])
+                setQuantity('크루시아', getQuantity('크루시아') - 1);
+            } else if (result[3] && getQuantity('행운목') > 0) {
+                setResultContent(flower[4])
+                setQuantity('행운목', getQuantity('행운목') - 1);
+            } else if (result[1] && getQuantity('산호수') > 0) {
+                setResultContent(flower[5])
+                setQuantity('산호수', getQuantity('산호수') - 1);
+            } else {
+                // resultContent = "음지식물";
+                setDark(true)
+            }
         }
-    } else if (!result[0]) {
-        if (!result[1] && result[3] && getQuantity('crusia') > 0) {
-            resultContent = flower[3];
-            setQuantity('crusia', getQuantity('crusia') - 1);
-        } else if (result[3] && getQuantity('luckTree') > 0) {
-            resultContent = flower[4];
-            setQuantity('luckTree', getQuantity('luckTree') - 1);
-        } else if (result[1] && getQuantity('tinyArdisia') > 0) {
-            resultContent = flower[5];
-            setQuantity('tinyArdisia', getQuantity('tinyArdisia') - 1);
-        } else {
-            resultContent = "음지식물";
-        }
-    }
+    }, [result]); // `result`가 변경될 때만 `useEffect`가 실행됩니다.
 
 
     // 다시 퀴즈를 시작할 수 있는 함수
@@ -59,13 +67,62 @@ const ResultPage = observer(() => {
         navigate('/'); // 메인 페이지로 이동
     };
 
+    const handlePlantSelection = (key: string) => {
+        const quantity = getQuantity(key);
+
+        if (quantity > 0) {
+            setQuantity(key, quantity - 1);
+            setWhite(false)
+            setDark(false)
+            navigate('/'); // 페이지 이동
+        }
+    };
+
     return (
         <Container>
-            <Title>당신의 식물은?</Title>
-            <ResultText>
-                {`당신의 식물은 ${resultContent} 입니다`}
-            </ResultText>
-            <RestartButton onClick={restartQuiz}>다시 하기</RestartButton>
+            {white && (
+                <>
+                    <Title>양지 식물 중 한 개를 선택해주세요</Title>
+                    {getQuantity('스킨답서스') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('스킨답서스')}>스킨답서스</RestartButton>
+                    )}
+                    {getQuantity('우주목') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('우주목')}>우주목</RestartButton>
+                    )}
+                    {getQuantity('스투키') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('스투키')}>스투키</RestartButton>
+                    )}
+                    <RestartButton onClick={restartQuiz}>다시 하기</RestartButton>
+
+                </>
+            )}
+
+            {dark && (
+                <>
+                    <Title>음지 식물 중 한 개를 선택해주세요</Title>
+                    {getQuantity('행운목') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('행운목')}>행운목</RestartButton>
+                    )}
+                    {getQuantity('산호수') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('산호수')}>산호수</RestartButton>
+                    )}
+                    {getQuantity('크루시아') > 0 && (
+                        <RestartButton onClick={() => handlePlantSelection('크루시아')}>크루시아</RestartButton>
+                    )}
+                    <RestartButton onClick={restartQuiz}>다시 하기</RestartButton>
+
+                </>
+            )}
+
+            {!white && !dark && (
+                <>
+                    <Title>당신의 식물은?</Title>
+                    <ResultText>
+                        {`당신의 식물은 ${resultContent} 입니다`}
+                    </ResultText>
+                    <RestartButton onClick={restartQuiz}>다시 하기</RestartButton>
+                </>
+            )}
         </Container>
     );
 });
@@ -86,7 +143,7 @@ const Title = styled.h1`
 `;
 
 const ResultText = styled.p`
-    
+
     font-size: 1.5rem;
     margin-bottom: 2rem;
 `;
@@ -99,6 +156,7 @@ const RestartButton = styled.button`
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 10px;
 
     &:hover {
         background-color: #0056b3;

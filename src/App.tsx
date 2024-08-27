@@ -10,6 +10,7 @@ import ResultPage from "./Page/ResultPage";
 
 export const App = observer(function App() {
     return (
+
         <Router>
             <Routes>
                 <Route path="/" element={<MainPage/>}/>
