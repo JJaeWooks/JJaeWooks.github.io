@@ -11,7 +11,7 @@ const Container = styled.div`
     align-items: center;
     height: 100vh;
     text-align: center;
-    background-image: url('/back.png');
+    background-image: url('/logo.png');
     /* 1. 이미지의 비율을 유지하면서 컨테이너를 완전히 채우되 이미지의 일부가 잘릴 수 있음 */
     background-size: cover;
 
@@ -25,7 +25,7 @@ const Container = styled.div`
     //background-size: 500px 500px;
 
     /* 5. 이미지 크기를 백분율로 지정 */
-    background-size: 100% 100%;
+    background-size: 80% 100%;
 
     background-position: center; /* 배경 이미지 위치 설정 */
     background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
